@@ -1,0 +1,16 @@
+[package]
+name = "reser"
+version = "0.1.0"
+authors = ["yoshihitoh <yoshihito.arih@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+clap = "2.32"
+serde = "1.0"
+serde_json = { version = "1.0", features = ["preserve_order"] }
+serde_yaml = "0.8"
+strum = "0.13"
+strum_macros = "0.13"
+
+[dev-dependencies]
+serde_derive = "1.0"
