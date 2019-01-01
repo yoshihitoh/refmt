@@ -1,4 +1,5 @@
 # reser
+[![Build Status](https://travis-ci.org/yoshihitoh/reser.svg?branch=master)](https://travis-ci.org/yoshihitoh/reser)
 
 Translate data format into another one. Currently only JSON and YAML are available.
 
