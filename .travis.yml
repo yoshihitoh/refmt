@@ -20,6 +20,8 @@ matrix:
 branches:
   only:
     - master
+    # NOTE: Need below regex to trigger deploy on push-tags
+    - /^\d+\.\d+\.\d+.*$/
 script: ci/script.sh
 before_deploy: ci/before_deploy.sh
 deploy:
