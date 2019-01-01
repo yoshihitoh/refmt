@@ -1,0 +1,39 @@
+language: rust
+env:
+  global:
+    - PROJECT_NAME: reser
+    - RUST_BACKTRACE: full
+addons:
+  apt:
+    packages:
+      # For building MUSL static builds on Linux.
+      - musl-tools
+matrix:
+  fast_finish: true
+  include:
+    - os: linux
+      rust: stable
+      env: TARGET=x86_64-unknown-linux-musl
+    - os: osx
+      rust: stable
+      env: TARGET=x86_64-apple-darwin
+branches:
+  only:
+    - master
+script: ci/script.sh
+before_deploy: ci/before_deploy.sh
+deploy:
+  provider: releases
+  skip_cleanup: true
+  file_glob: true
+  file: deployment/${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.tar.gz
+  on:
+    condition: $TRAVIS_RUST_VERSION = stable
+    repo: yoshihitoh/reser
+    branch: master
+    tags: true
+  api_key:
+    secure: lvPYzjxuh7F8tV2w/XwgN5A1KC2w/Is1PRp+7gnIq95+e8Vi39H9KAo2bQlNTVEfoTGZhfyE4lC/+EwngORViHLeimtJSfWP496O127sHcvKYfmS9hChtuckglcX3TYj17jMVC34RWIK/LBrdgZb/aGN0VUcymh7sklw4H/0yYRwgLKqT0NgeKgZ5HadoeMocq14CJcTfbyXy+/0Eu7OGAGdGj8nZ0Uxh3mny6vDsw5EkthS6Q91JZjIA+NhqNflIqvELDZAenQbN7HOQ+lHclO6onfIZknIvEO2FSnSmgg03GDyRqI1e7f2D3H1cvegRDOJhMb3m9ob/vliPXXELx1uHgFOverRiIpOe9NMUWVwoKXozeMdPunNj19vXb09JnD3ryPsw/0JS0W984SflnUiTbM9awhDF+lCircEh6xuVFuWiTThQixm8jHavotLCsGA4rK3Cf+W97U8k0AsTJcs5d7AtLr0M+4Kq4OGjzZ6WwRbP7wQRXSCEiD1Rn3rVnOddQXHjaLQpT56V/O3kj+3b0rhFHag2q8LEq0D24sOmvSkEMBIscdio8IKP24VazhA9Ut7cGNPZjT9MqpPtdKMS0y0Zuti0tN/F4avorB+SXrMWHJV3eysjuh1UXfMmP7XiWsIiG9Uw8vpemSZs6+sATY55wagNAbD75kZRNM=
+notifications:
+  email:
+    on_success: never
