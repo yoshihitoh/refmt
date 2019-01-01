@@ -18,6 +18,7 @@ matrix:
       rust: stable
       env: TARGET=x86_64-apple-darwin
 script:
+  - rustup target add "$TARGET"
   - cargo build --target "$TARGET" --verbose
   - cargo test --target "$TARGET" --verbose
 branches:
