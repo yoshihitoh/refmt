@@ -23,6 +23,7 @@ script:
 branches:
   only:
     - master
+    - /^feature\/.*$/
 notifications:
   email:
     on_success: never
