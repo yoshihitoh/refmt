@@ -1,4 +1,5 @@
 language: rust
+cache: cargo
 env:
   global:
     - PROJECT_NAME: reser
@@ -22,6 +23,7 @@ branches:
     - master
     # NOTE: Need below regex to trigger deploy on push-tags
     - /^\d+\.\d+\.\d+.*$/
+    - /^feature\/.*$/
 script: ci/script.sh
 before_deploy: ci/before_deploy.sh
 deploy:
