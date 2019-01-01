@@ -1,0 +1,28 @@
+language: rust
+env:
+  global:
+    - PROJECT_NAME: reser
+    - RUST_BACKTRACE: full
+addons:
+  apt:
+    packages:
+      # For building MUSL static builds on Linux.
+      - musl-tools
+matrix:
+  fast_finish: true
+  include:
+    - os: linux
+      rust: stable
+      env: TARGET=x86_64-unknown-linux-musl
+    - os: osx
+      rust: stable
+      env: TARGET=x86_64-apple-darwin
+script:
+  - cargo build --target "$TARGET" --verbose
+  - cargo test --target "$TARGET" --verbose
+branches:
+  only:
+    - master
+notifications:
+  email:
+    on_success: never
