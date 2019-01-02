@@ -38,6 +38,7 @@ impl FromStr for Format {
             "json" => Some(Format::Json),
             "toml" => Some(Format::Toml),
             "yaml" => Some(Format::Yaml),
+            "yml" => Some(Format::Yaml),
             _ => None,
         }
         .ok_or(TranslateError::Message(format!(
@@ -76,6 +77,13 @@ mod tests {
     use super::*;
 
     #[test]
+    fn format_name() {
+        assert_eq!(Format::Json.name(), "json");
+        assert_eq!(Format::Toml.name(), "toml");
+        assert_eq!(Format::Yaml.name(), "yaml");
+    }
+
+    #[test]
     fn format_from_str() {
         let r = Format::from_str("json");
         assert!(r.is_ok());
@@ -86,6 +94,10 @@ mod tests {
         assert_eq!(r.ok().unwrap(), Format::Toml);
 
         let r = Format::from_str("yaml");
+        assert!(r.is_ok());
+        assert_eq!(r.ok().unwrap(), Format::Yaml);
+
+        let r = Format::from_str("yml");
         assert!(r.is_ok());
         assert_eq!(r.ok().unwrap(), Format::Yaml);
     }
