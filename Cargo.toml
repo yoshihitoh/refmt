@@ -11,6 +11,7 @@ serde_json = { version = "1.0", features = ["preserve_order"] }
 serde_yaml = "0.8"
 strum = "0.13"
 strum_macros = "0.13"
+toml = "0.4"
 
 [dev-dependencies]
 serde_derive = "1.0"
