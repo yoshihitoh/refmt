@@ -7,6 +7,7 @@ use clap::{App, Arg};
 
 mod translator;
 use crate::translator::json::JsonTranslator;
+use crate::translator::toml::TomlTranslator;
 use crate::translator::translator::{Format, TranslateError, Translator};
 use crate::translator::yaml::YamlTranslator;
 
@@ -32,11 +33,13 @@ impl From<TranslateError> for ConvertError {
 type ConvertResult<T> = Result<T, ConvertError>;
 
 static JSON_TRANSLATOR: JsonTranslator = JsonTranslator {};
+static TOML_TRANSLATOR: TomlTranslator = TomlTranslator {};
 static YAML_TRANSLATOR: YamlTranslator = YamlTranslator {};
 
 fn translator_for(format: Format) -> &'static Translator {
     match format {
         Format::Json => &JSON_TRANSLATOR,
+        Format::Toml => &TOML_TRANSLATOR,
         Format::Yaml => &YAML_TRANSLATOR,
     }
 }

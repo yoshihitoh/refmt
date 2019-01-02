@@ -6,11 +6,13 @@ use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 use super::json::parse_json;
+use super::toml::parse_toml;
 use super::yaml::parse_yaml;
 
 #[derive(Copy, Clone, Debug, PartialEq, EnumIter)]
 pub enum Format {
     Json,
+    Toml,
     Yaml,
 }
 
@@ -18,6 +20,7 @@ impl Format {
     pub fn name(&self) -> &'static str {
         match *self {
             Format::Json => "json",
+            Format::Toml => "toml",
             Format::Yaml => "yaml",
         }
     }
@@ -33,6 +36,7 @@ impl FromStr for Format {
     fn from_str(s: &str) -> Result<Self, <Self as FromStr>::Err> {
         match s.to_ascii_lowercase().as_ref() {
             "json" => Some(Format::Json),
+            "toml" => Some(Format::Toml),
             "yaml" => Some(Format::Yaml),
             _ => None,
         }
@@ -65,6 +69,7 @@ where
 {
     match fmt {
         Format::Json => parse_json(s).map_err(to_translate_error),
+        Format::Toml => parse_toml(s).map_err(to_translate_error),
         Format::Yaml => parse_yaml(s).map_err(to_translate_error),
     }
 }
@@ -83,11 +88,12 @@ mod tests {
         assert!(r.is_ok());
         assert_eq!(r.ok().unwrap(), Format::Json);
 
+        let r = Format::from_str("toml");
+        assert!(r.is_ok());
+        assert_eq!(r.ok().unwrap(), Format::Toml);
+
         let r = Format::from_str("yaml");
         assert!(r.is_ok());
         assert_eq!(r.ok().unwrap(), Format::Yaml);
-
-        let r = Format::from_str("toml");
-        assert!(r.is_err());
     }
 }
