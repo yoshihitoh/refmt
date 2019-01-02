@@ -3,7 +3,7 @@ use std::io::{self, stdin, stdout, BufReader, BufWriter, Read, Stdin, Stdout, Wr
 use std::path::Path;
 use std::str::FromStr;
 
-use clap::{App, Arg};
+use clap::{crate_authors, crate_name, crate_version, App, Arg};
 
 mod translator;
 use crate::translator::json::JsonTranslator;
@@ -59,10 +59,10 @@ fn infer_format(file: Option<&str>, format_name: Option<&str>) -> Result<Format,
 }
 
 fn parse_args() -> ConvertResult<ProgramOptions> {
-    let mut app = App::new("reser")
+    let mut app = App::new(crate_name!())
         .about("Translate data format into another one.")
-        .author("yoshihitoh <yoshihito.arih@gmail.com>")
-        .version("0.1.0")
+        .author(crate_authors!())
+        .version(crate_version!())
         .arg(
             Arg::with_name("INPUT")
                 .help("set the input file to use")
