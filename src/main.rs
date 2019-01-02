@@ -4,8 +4,13 @@ use std::path::Path;
 use std::str::FromStr;
 
 use clap::{crate_authors, crate_name, crate_version, App, Arg};
+use syntect::easy::HighlightLines;
+use syntect::highlighting::ThemeSet;
+use syntect::parsing::SyntaxSet;
+use syntect::util::as_24_bit_terminal_escaped;
 
 mod translator;
+
 use crate::translator::json::JsonTranslator;
 use crate::translator::toml::TomlTranslator;
 use crate::translator::translator::{Format, TranslateError, Translator};
@@ -159,9 +164,25 @@ fn read_all_text(r: Box<Read>) -> ConvertResult<String> {
     Ok(s)
 }
 
-fn write_all_text(w: Box<Write>, s: &str) -> ConvertResult<()> {
+fn write_all_text(w: Box<Write>, s: &str, fmt: Format) -> ConvertResult<()> {
     let mut writer = BufWriter::new(w);
-    writeln!(writer, "{}", s)?;
+
+    let ps = SyntaxSet::load_defaults_newlines();
+    let syntax = ps.find_syntax_by_extension(fmt.preferred_extension());
+    let is_tty = atty::is(atty::Stream::Stdout);
+
+    if is_tty && syntax.is_some() {
+        let syntax = syntax.unwrap();
+        let ts = ThemeSet::load_defaults();
+        let mut h = HighlightLines::new(syntax, &ts.themes["base16-ocean.dark"]);
+
+        let ranges = h.highlight(s, &ps);
+        let escaped = as_24_bit_terminal_escaped(&ranges, true);
+        writeln!(writer, "{}", escaped)?;
+    } else {
+        writeln!(writer, "{}", s)?;
+    }
+
     Ok(())
 }
 
@@ -172,5 +193,5 @@ fn run(option: ProgramOptions) -> ConvertResult<()> {
     let from_text = read_all_text(r)?;
     let translator = translator_for(option.output_format);
     let to_text = translator.translate(&from_text, option.input_format)?;
-    write_all_text(w, &to_text)
+    write_all_text(w, &to_text, option.output_format)
 }
