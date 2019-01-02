@@ -68,6 +68,17 @@ $ cat <<EOS | ./target/release/reser --input-format yaml --output-format json
 }
 ```
 
+## JSON to TOML
+``` bash
+$ echo '{"id": 1, "name": {"first": "John", "last": "Doe"}}' | reser --input-format json --output-format toml
+id = 1
+
+[name]
+first = 'John'
+last = 'Doe'
+
+```
+
 # Running tests
 ```bash
 $ cargo test --all
