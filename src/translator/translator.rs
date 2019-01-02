@@ -38,25 +38,19 @@ impl FromStr for Format {
             "json" => Some(Format::Json),
             "toml" => Some(Format::Toml),
             "yaml" => Some(Format::Yaml),
+            "yml" => Some(Format::Yaml),
             _ => None,
         }
-        .ok_or(TranslateError {
-            msg: format!("unsupported format: {}", s),
-        })
+        .ok_or(TranslateError::Message(format!(
+            "unsupported format: {}",
+            s
+        )))
     }
 }
 
 #[derive(Debug)]
-pub struct TranslateError {
-    msg: String,
-}
-
-impl<T: Error> From<T> for TranslateError {
-    fn from(e: T) -> Self {
-        TranslateError {
-            msg: format!("{}", e),
-        }
-    }
+pub enum TranslateError {
+    Message(String),
 }
 
 pub trait Translator {
@@ -75,12 +69,19 @@ where
 }
 
 pub fn to_translate_error<E: Error>(e: E) -> TranslateError {
-    TranslateError::from(e)
+    TranslateError::Message(format!("{}", e))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn format_name() {
+        assert_eq!(Format::Json.name(), "json");
+        assert_eq!(Format::Toml.name(), "toml");
+        assert_eq!(Format::Yaml.name(), "yaml");
+    }
 
     #[test]
     fn format_from_str() {
@@ -93,6 +94,10 @@ mod tests {
         assert_eq!(r.ok().unwrap(), Format::Toml);
 
         let r = Format::from_str("yaml");
+        assert!(r.is_ok());
+        assert_eq!(r.ok().unwrap(), Format::Yaml);
+
+        let r = Format::from_str("yml");
         assert!(r.is_ok());
         assert_eq!(r.ok().unwrap(), Format::Yaml);
     }

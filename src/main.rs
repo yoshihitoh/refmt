@@ -52,7 +52,13 @@ struct ProgramOptions {
     output_format: Format,
 }
 
-fn infer_format(file: Option<&str>, format_name: Option<&str>) -> Result<Format, TranslateError> {
+fn infer_format(file: Option<&str>, format_name: Option<&str>) -> ConvertResult<Format> {
+    if file.is_none() && format_name.is_none() {
+        return Err(ConvertError::ArgumentError(
+            "cannot determine file format, need to specify either FILE or FORMAT".to_string(),
+        ));
+    }
+
     let format_name = format_name
         .or(file.and_then(|f| Path::new(f).extension().map(|ext| ext.to_str().unwrap())));
     Ok(Format::from_str(format_name.unwrap_or(""))?)
@@ -108,15 +114,12 @@ fn parse_args() -> ConvertResult<ProgramOptions> {
                 e
             ))
         })?;
-    let output_format =
-        infer_format(m.value_of("OUTPUT"), m.value_of("OUTPUT_FORMAT")).map_err(|e| {
-            app.print_long_help().unwrap_or(());
-
-            ConvertError::ArgumentError(format!(
-                "cannot determine format of the output file: {:?}",
-                e
-            ))
-        })?;
+    let output_format = infer_format(m.value_of("OUTPUT"), m.value_of("OUTPUT_FORMAT"));
+    let output_format = if let Err(ConvertError::ArgumentError(_)) = output_format {
+        input_format
+    } else {
+        output_format?
+    };
 
     let option = ProgramOptions {
         input: m.value_of("INPUT").map(|s| s.to_string()),
@@ -167,13 +170,7 @@ fn run(option: ProgramOptions) -> ConvertResult<()> {
     let w = writer_for(option.output.as_ref().map(|s| s.as_str()), stdout())?;
 
     let from_text = read_all_text(r)?;
-
-    let to_text = if option.input_format == option.output_format {
-        from_text
-    } else {
-        let translator = translator_for(option.output_format);
-        translator.translate(&from_text, option.input_format)?
-    };
-
+    let translator = translator_for(option.output_format);
+    let to_text = translator.translate(&from_text, option.input_format)?;
     write_all_text(w, &to_text)
 }
