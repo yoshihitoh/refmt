@@ -1,7 +1,7 @@
 # reser
 [![Build Status](https://travis-ci.org/yoshihitoh/reser.svg?branch=master)](https://travis-ci.org/yoshihitoh/reser)
 
-Translate data format into another one. Currently only JSON and YAML are available.
+reser is a data format translation tool written in Rust. Currently only JSON and YAML are available.
 
 # Installation
 reser is written ins Rust, so you need Rust toolchains. reser compiled with Rust 1.30.0 (stable) or newer.
