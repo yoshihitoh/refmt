@@ -28,6 +28,10 @@ impl Format {
     pub fn names() -> Vec<&'static str> {
         Format::iter().map(|x| x.name()).collect()
     }
+
+    pub fn preferred_extension(&self) -> &'static str {
+        self.name()
+    }
 }
 
 impl FromStr for Format {

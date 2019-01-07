@@ -1,0 +1,9 @@
+[submodule "assets/syntaxes/sublime_toml_highlighting"]
+	path = assets/syntaxes/sublime_toml_highlighting
+	url = https://github.com/jasonwilliams/sublime_toml_highlighting.git
+[submodule "assets/themes/sublime-monokai-extended"]
+	path = assets/themes/sublime-monokai-extended
+	url = https://github.com/jonschlinkert/sublime-monokai-extended
+[submodule "assets/syntaxes/Packages"]
+	path = assets/syntaxes/Packages
+	url = https://github.com/sublimehq/Packages.git

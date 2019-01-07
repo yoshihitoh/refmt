@@ -4,14 +4,36 @@ version = "0.1.1"
 authors = ["yoshihitoh <yoshihito.arih@gmail.com>"]
 edition = "2018"
 
+[lib]
+name = "reser_core"
+path = "src/lib.rs"
+
+[[bin]]
+name = "reser"
+path = "src/bin/reser.rs"
+
+[[bin]]
+name = "reser-generate-assets"
+path = "src/bin/generate_assets.rs"
+
 [dependencies]
+atty = "0.2"
+bincode = "1.0"
 clap = "2.32"
 serde = "1.0"
-serde_json = { version = "1.0", features = ["preserve_order"] }
 serde_yaml = "0.8"
 strum = "0.13"
 strum_macros = "0.13"
 toml = "0.4"
+
+[dependencies.serde_json]
+version = "1.0"
+features = ["preserve_order"]
+
+[dependencies.syntect]
+version = "3.0"
+default_features = false
+features = ["parsing", "yaml-load", "dump-load", "dump-create"]
 
 [dev-dependencies]
 serde_derive = "1.0"
