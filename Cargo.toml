@@ -19,12 +19,15 @@ path = "src/bin/generate_assets.rs"
 [dependencies]
 atty = "0.2"
 bincode = "1.0"
-clap = "2.32"
 serde = "1.0"
 serde_yaml = "0.8"
 strum = "0.13"
 strum_macros = "0.13"
 toml = "0.4"
+
+[dependencies.clap ]
+version = "2.32"
+features = ["suggestions", "color", "wrap_help"]
 
 [dependencies.serde_json]
 version = "1.0"

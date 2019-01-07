@@ -3,7 +3,7 @@ use std::io::{self, stdin, stdout, BufReader, BufWriter, Read, Stdin, Stdout, Wr
 use std::path::Path;
 use std::str::FromStr;
 
-use clap::{crate_authors, crate_name, crate_version, App, Arg};
+use clap::{crate_authors, crate_name, crate_version, App, AppSettings, Arg};
 use syntect::easy::HighlightLines;
 use syntect::util::as_24_bit_terminal_escaped;
 
@@ -66,6 +66,7 @@ struct ProgramOptions {
     input_format: Format,
     output: Option<String>,
     output_format: Format,
+    is_tty: bool,
 }
 
 fn infer_format(file: Option<&str>, format_name: Option<&str>) -> ConvertResult<Format> {
@@ -81,10 +82,18 @@ fn infer_format(file: Option<&str>, format_name: Option<&str>) -> ConvertResult<
 }
 
 fn parse_args() -> ConvertResult<ProgramOptions> {
+    let is_tty = atty::is(atty::Stream::Stdout);
+    let color_setting = if is_tty {
+        AppSettings::ColoredHelp
+    } else {
+        AppSettings::ColorNever
+    };
+
     let mut app = App::new(crate_name!())
         .about("Translate data format into another one.")
         .author(crate_authors!())
         .version(crate_version!())
+        .global_setting(color_setting)
         .arg(
             Arg::with_name("INPUT")
                 .help("set the input file to use")
@@ -142,6 +151,7 @@ fn parse_args() -> ConvertResult<ProgramOptions> {
         input_format,
         output: m.value_of("OUTPUT").map(|s| s.to_string()),
         output_format,
+        is_tty,
     };
 
     Ok(option)
@@ -180,12 +190,12 @@ fn write_all_text(
     s: &str,
     fmt: Format,
     assets: &HighlightAssets,
+    is_tty: bool,
 ) -> ConvertResult<()> {
     let mut writer = BufWriter::new(w);
 
     let ps = &assets.syntax_set;
     let syntax = ps.find_syntax_by_extension(fmt.preferred_extension());
-    let is_tty = atty::is(atty::Stream::Stdout);
 
     if is_tty && syntax.is_some() {
         let syntax = syntax.unwrap();
@@ -210,5 +220,5 @@ fn run(option: ProgramOptions) -> ConvertResult<()> {
     let from_text = read_all_text(r)?;
     let translator = translator_for(option.output_format);
     let to_text = translator.translate(&from_text, option.input_format)?;
-    write_all_text(w, &to_text, option.output_format, &assets)
+    write_all_text(w, &to_text, option.output_format, &assets, option.is_tty)
 }
