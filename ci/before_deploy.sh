@@ -15,8 +15,8 @@ make_tarball() {
     local out_dir="$(pwd)/deployment"
     mkdir -p "$out_dir"
 
-    cp "target/$TARGET/release/reser" "$staging/reser"
-    strip "$staging/reser"
+    cp "target/$TARGET/release/refmt" "$staging/refmt"
+    strip "$staging/refmt"
     cp {README.md,LICENSE} "$staging"
 
     (cd "$tmp_dir" && tar czf "$out_dir/$name.tar.gz" "$name")

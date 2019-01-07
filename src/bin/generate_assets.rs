@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use clap::{App, Arg};
-use reser_core::assets::HighlightAssets;
+use refmt_core::assets::HighlightAssets;
 
 #[derive(Debug)]
 struct ProgramOption {

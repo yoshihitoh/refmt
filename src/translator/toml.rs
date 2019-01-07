@@ -65,7 +65,7 @@ mod tests {
             },
             "repos": [
                 { "name": "zstd-codec", "language": "C++"},
-                { "name": "reser", "language": "Rust"}
+                { "name": "refmt", "language": "Rust"}
             ]
         }
         "#;
@@ -87,7 +87,7 @@ name = 'zstd-codec'
 
 [[repos]]
 language = 'Rust'
-name = 'reser'
+name = 'refmt'
 
 [name]
 first = 'John'
@@ -100,7 +100,7 @@ last = 'Doe'
     fn test_parse_toml() {
         let toml_text = r#"
 [package]
-name = "reser"
+name = "refmt"
 authors = ["yoshihitoh <yoshihito.arih@gmail.com>"]
 edition = "2018"
 
@@ -117,7 +117,7 @@ toml = "0.4"
         let manifest = parse_toml::<Manifest>(toml_text);
         assert!(manifest.is_ok());
         let manifest = manifest.ok().unwrap();
-        assert_eq!(manifest.package.name, "reser");
+        assert_eq!(manifest.package.name, "refmt");
         assert_eq!(
             manifest.package.authors,
             vec!["yoshihitoh <yoshihito.arih@gmail.com>"]

@@ -7,11 +7,11 @@ use clap::{crate_authors, crate_name, crate_version, App, Arg};
 use syntect::easy::HighlightLines;
 use syntect::util::as_24_bit_terminal_escaped;
 
-use reser_core::assets::HighlightAssets;
-use reser_core::translator::json::JsonTranslator;
-use reser_core::translator::toml::TomlTranslator;
-use reser_core::translator::translator::{Format, TranslateError, Translator};
-use reser_core::translator::yaml::YamlTranslator;
+use refmt_core::assets::HighlightAssets;
+use refmt_core::translator::json::JsonTranslator;
+use refmt_core::translator::toml::TomlTranslator;
+use refmt_core::translator::translator::{Format, TranslateError, Translator};
+use refmt_core::translator::yaml::YamlTranslator;
 
 #[derive(Debug)]
 enum ConvertError {

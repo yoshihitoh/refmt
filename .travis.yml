@@ -2,7 +2,7 @@ language: rust
 cache: cargo
 env:
   global:
-    - PROJECT_NAME: reser
+    - PROJECT_NAME: refmt
     - RUST_BACKTRACE: full
 addons:
   apt:
@@ -33,7 +33,7 @@ deploy:
   file: deployment/${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.tar.gz
   on:
     condition: $TRAVIS_RUST_VERSION = stable
-    repo: yoshihitoh/reser
+    repo: yoshihitoh/refmt
     branch: master
     tags: true
   api_key:

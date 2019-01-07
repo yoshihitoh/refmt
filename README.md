@@ -1,30 +1,30 @@
-# reser
-[![Build Status](https://travis-ci.org/yoshihitoh/reser.svg?branch=master)](https://travis-ci.org/yoshihitoh/reser)
+# refmt
+[![Build Status](https://travis-ci.org/yoshihitoh/refmt.svg?branch=master)](https://travis-ci.org/yoshihitoh/refmt)
 
-reser is a data format translation tool written in Rust. Currently only JSON, YAML and TOML are available.
+refmt is a data format translation tool written in Rust. Currently only JSON, YAML and TOML are available.
 
 # Installation
-reser is written ins Rust, so you need Rust toolchains. reser compiled with Rust 1.30.0 (stable) or newer.
+refmt is written ins Rust, so you need Rust toolchains. refmt compiled with Rust 1.30.0 (stable) or newer.
 
-To build reser:
+To build refmt:
 
 ```bash
-$ git clone https://github.com/yoshihitoh/reser
-$ cd reser
+$ git clone https://github.com/yoshihitoh/refmt
+$ cd refmt
 $ cargo build --release
-$ ./target/release/reser --version
-reser 0.1.0
+$ ./target/release/refmt --version
+refmt 0.1.2
 ```
 
 # Usage
 ``` bash
-$ ./target/release/reser --help
-reser 0.1.0
+$ ./target/release/refmt --help
+refmt 0.1.2
 yoshihitoh <yoshihito.arih@gmail.com>
 Translate data format into another one.
 
 USAGE:
-    reser [OPTIONS]
+    refmt [OPTIONS]
 
 FLAGS:
     -h, --help       Prints help information
@@ -41,7 +41,7 @@ OPTIONS:
 
 ## JSON to YAML
 ``` bash
-$ echo '{"id": 1, "name": {"first": "John", "last": "Doe"}}' | ./target/release/reser --input-format json --output-format yaml
+$ echo '{"id": 1, "name": {"first": "John", "last": "Doe"}}' | ./target/release/refmt --input-format json --output-format yaml
 ---
 id: 1
 name:
@@ -52,7 +52,7 @@ name:
 
 ## YAML to JSON
 ``` bash
-$ cat <<EOS | ./target/release/reser --input-format yaml --output-format json
+$ cat <<EOS | ./target/release/refmt --input-format yaml --output-format json
 > ---
 > id: 1
 > name:
@@ -70,7 +70,7 @@ $ cat <<EOS | ./target/release/reser --input-format yaml --output-format json
 
 ## JSON to TOML
 ``` bash
-$ echo '{"id": 1, "name": {"first": "John", "last": "Doe"}}' | reser --input-format json --output-format toml
+$ echo '{"id": 1, "name": {"first": "John", "last": "Doe"}}' | refmt --input-format json --output-format toml
 id = 1
 
 [name]

@@ -1,19 +1,19 @@
 [package]
-name = "reser"
-version = "0.1.1"
+name = "refmt"
+version = "0.1.2"
 authors = ["yoshihitoh <yoshihito.arih@gmail.com>"]
 edition = "2018"
 
 [lib]
-name = "reser_core"
+name = "refmt_core"
 path = "src/lib.rs"
 
 [[bin]]
-name = "reser"
-path = "src/bin/reser.rs"
+name = "refmt"
+path = "src/bin/refmt.rs"
 
 [[bin]]
-name = "reser-generate-assets"
+name = "refmt-generate-assets"
 path = "src/bin/generate_assets.rs"
 
 [dependencies]
