@@ -1,6 +1,6 @@
 [package]
 name = "refmt"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["yoshihitoh <yoshihito.arih@gmail.com>"]
 edition = "2018"
 
