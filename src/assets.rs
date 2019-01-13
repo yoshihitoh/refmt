@@ -2,6 +2,7 @@ use syntect::highlighting::{Theme, ThemeSet};
 use syntect::parsing::{SyntaxReference, SyntaxSet};
 
 const DEFAULT_THEME: &str = "Monokai Extended";
+const JSON_THEME: &str = "Monokai JSON+";
 
 pub struct HighlightAssets {
     pub syntax_set: SyntaxSet,
@@ -30,6 +31,14 @@ impl HighlightAssets {
 
     pub fn get_theme(&self, name: &str) -> &Theme {
         &self.theme_set.themes[name]
+    }
+
+    pub fn get_theme_for_syntax(&self, syntax: &SyntaxReference) -> &Theme {
+        self.get_theme(if syntax.name.to_ascii_lowercase() == "json" {
+            JSON_THEME
+        } else {
+            DEFAULT_THEME
+        })
     }
 
     pub fn themes(&self) -> Vec<&Theme> {
