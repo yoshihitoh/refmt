@@ -7,3 +7,6 @@
 [submodule "assets/syntaxes/Packages"]
 	path = assets/syntaxes/Packages
 	url = https://github.com/sublimehq/Packages.git
+[submodule "assets/themes/MonokaiJsonPlus"]
+	path = assets/themes/MonokaiJsonPlus
+	url = https://github.com/ColibriApps/MonokaiJsonPlus
