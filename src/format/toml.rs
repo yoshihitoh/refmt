@@ -1,24 +1,18 @@
-use serde::Deserialize;
+use failure::ResultExt;
+use serde::de;
+use serde::ser;
 
-use super::translator::{parse_as, to_translate_error, Format, TranslateError, Translator};
+use crate::errors::{self, ErrorKind};
 
-pub struct TomlTranslator {}
-
-impl Default for TomlTranslator {
-    fn default() -> Self {
-        TomlTranslator {}
-    }
+pub fn serialize<V: ser::Serialize>(v: V) -> Result<String, errors::Error> {
+    Ok(toml::to_string(&v).context(ErrorKind::Serialization)?)
 }
 
-impl Translator for TomlTranslator {
-    fn translate(&self, s: &str, fmt: Format) -> Result<String, TranslateError> {
-        let value = parse_as::<toml::Value>(s, fmt)?;
-        toml::to_string_pretty(&value).map_err(to_translate_error)
-    }
-}
-
-pub fn parse_toml<'de, V: Deserialize<'de>>(s: &'de str) -> Result<V, toml::de::Error> {
-    toml::from_str(s)
+pub fn deserialize<V>(s: &str) -> Result<V, errors::Error>
+where
+    V: for<'de> de::Deserialize<'de>,
+{
+    Ok(toml::from_str(s).context(ErrorKind::Deserialization)?)
 }
 
 #[cfg(test)]
@@ -54,50 +48,7 @@ mod tests {
     }
 
     #[test]
-    fn test_translate() {
-        let translator = TomlTranslator {};
-        let json_text = r#"
-        {
-            "id": 1,
-            "name": {
-                "first": "John",
-                "last": "Doe"
-            },
-            "repos": [
-                { "name": "zstd-codec", "language": "C++"},
-                { "name": "refmt", "language": "Rust"}
-            ]
-        }
-        "#;
-        let toml = translator.translate(json_text, Format::Json);
-        assert!(toml.is_ok());
-        let toml = toml.ok().unwrap();
-
-        // REF: https://github.com/alexcrichton/toml-rs/issues/232
-        // toml-rs 0.4 doesn't support `preserve_order` feature, and using `BTreeMap` internally.
-        // So we need to compare items in alphabetical order.
-        // The `preserve_order` feature is planned to release on toml-rs 0.5.
-        assert_eq!(
-            &toml,
-            r#"id = 1
-
-[[repos]]
-language = 'C++'
-name = 'zstd-codec'
-
-[[repos]]
-language = 'Rust'
-name = 'refmt'
-
-[name]
-first = 'John'
-last = 'Doe'
-"#
-        );
-    }
-
-    #[test]
-    fn test_parse_toml() {
+    fn success() {
         let toml_text = r#"
 [package]
 name = "refmt"
@@ -114,7 +65,8 @@ strum_macros = "0.13"
 toml = "0.4"
 "#;
 
-        let manifest = parse_toml::<Manifest>(toml_text);
+        // deserialize
+        let manifest = deserialize::<Manifest>(toml_text);
         assert!(manifest.is_ok());
         let manifest = manifest.ok().unwrap();
         assert_eq!(manifest.package.name, "refmt");
@@ -125,7 +77,7 @@ toml = "0.4"
         assert_eq!(manifest.package.edition, Some("2018".to_string()));
 
         assert!(manifest.dependencies.is_some());
-        let dependencies = manifest.dependencies.unwrap();
+        let dependencies = manifest.dependencies.as_ref().unwrap();
         assert_eq!(dependencies.len(), 7);
         assert_eq!(
             dependencies.get("clap"),
@@ -157,6 +109,21 @@ toml = "0.4"
         assert_eq!(
             dependencies.get("toml"),
             Some(&Dependency::Simple("0.4".to_string()))
+        );
+
+        // serialize
+        // TODO: cannot serialize manifest object due to `ValueAfterTable` error. I need to survey why the error occurs.
+        let toml_text = serialize(&manifest.package);
+        assert!(toml_text.is_ok());
+        let toml_text = toml_text.ok().unwrap();
+
+        // NOTE: toml-rs uses BTreeMap internally, so the result will be alphabetical ordered.
+        assert_eq!(
+            r#"name = "refmt"
+authors = ["yoshihitoh <yoshihito.arih@gmail.com>"]
+edition = "2018"
+"#,
+            toml_text
         );
     }
 }
