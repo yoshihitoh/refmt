@@ -24,8 +24,8 @@ branches:
     # NOTE: Need below regex to trigger deploy on push-tags
     - /^\d+\.\d+\.\d+.*$/
     - /^feature\/.*$/
-script: ci/script.sh
-before_deploy: ci/before_deploy.sh
+script: ci/script.bash
+before_deploy: ci/before_deploy.bash
 deploy:
   provider: releases
   skip_cleanup: true
