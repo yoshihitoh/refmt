@@ -3,6 +3,11 @@
 
 refmt is a data format translation tool written in Rust. Currently only JSON, YAML and TOML are available.
 
+# Syntax highlighting
+refmt supports syntax highlighting.
+
+![Syntax highlighting example](https://i.imgur.com/vSlsRAC.png)
+
 # Installation
 refmt is written ins Rust, so you need Rust toolchains. refmt compiled with Rust 1.30.0 (stable) or newer.
 
