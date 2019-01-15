@@ -10,9 +10,6 @@ mod json;
 mod toml;
 mod yaml;
 
-// NOTE: Use serde_json::Value as intermediate type, it keeps field orders, and have enough type to convert to another format.
-type Value = serde_json::Value;
-
 #[derive(Fail, Debug)]
 #[fail(display = "Unsupported format: {}", name)]
 struct UnsupportedFormatError {
@@ -81,19 +78,32 @@ impl FormattedText {
     }
 
     pub fn convert_to(&self, format: Format) -> Result<FormattedText, errors::Error> {
-        let value = self.deserialize(&self.text)?;
-        Self::serialize(format, &value).map(|s| FormattedText::new(format, s))
-    }
-
-    fn serialize(format: Format, v: &Value) -> Result<String, errors::Error> {
         match format {
-            Format::Json => json::serialize(v),
-            Format::Toml => toml::serialize(v),
-            Format::Yaml => yaml::serialize(v),
+            Format::Json => self.to_json(),
+            Format::Toml => self.to_toml(),
+            Format::Yaml => self.to_yaml(),
         }
+        .map(|text| FormattedText { text, format })
     }
 
-    fn deserialize(&self, s: &str) -> Result<Value, errors::Error> {
+    fn to_json(&self) -> Result<String, errors::Error> {
+        let value = self.deserialize::<json::InnerValue>(&self.text)?;
+        json::serialize(&value)
+    }
+
+    fn to_toml(&self) -> Result<String, errors::Error> {
+        let value = self.deserialize::<toml::InnerValue>(&self.text)?;
+        toml::serialize(&value)
+    }
+    fn to_yaml(&self) -> Result<String, errors::Error> {
+        let value = self.deserialize::<yaml::InnerValue>(&self.text)?;
+        yaml::serialize(&value)
+    }
+
+    fn deserialize<V>(&self, s: &str) -> Result<V, errors::Error>
+    where
+        V: for<'de> serde::Deserialize<'de>,
+    {
         match self.format {
             Format::Json => json::deserialize(s),
             Format::Toml => toml::deserialize(s),
@@ -115,15 +125,6 @@ mod tests {
     "last_name": "Doe"
   }
 }"#;
-
-    static TOML_TEXT: &'static str = r#"id = 123
-title = "Lorem ipsum dolor sit amet"
-
-[author]
-id = 999
-first_name = "John"
-last_name = "Doe"
-"#;
 
     static YAML_TEXT: &'static str = r#"---
 id: 123
@@ -162,7 +163,17 @@ author:
         // JSON => TOML
         let r = text.convert_to(Format::Toml);
         assert!(r.is_ok());
-        assert_eq!(TOML_TEXT, r.as_ref().ok().unwrap().text);
+        assert_eq!(
+            r#"id = 123
+title = "Lorem ipsum dolor sit amet"
+
+[author]
+first_name = "John"
+id = 999
+last_name = "Doe"
+"#,
+            r.as_ref().ok().unwrap().text
+        );
 
         // JSON => YAML
         let r = text.convert_to(Format::Yaml);
@@ -178,7 +189,18 @@ author:
 
     #[test]
     fn convert_toml() {
-        let text = FormattedText::new(Format::Toml, TOML_TEXT.to_string());
+        let text = FormattedText::new(
+            Format::Toml,
+            r#"id = 123
+title = "Lorem ipsum dolor sit amet"
+
+[author]
+id = 999
+first_name = "John"
+last_name = "Doe"
+"#
+            .to_string(),
+        );
 
         // TOML => JSON
         let r = text.convert_to(Format::Json);
@@ -209,7 +231,17 @@ author:
         // YAML => TOML
         let r = text.convert_to(Format::Toml);
         assert!(r.is_ok());
-        assert_eq!(TOML_TEXT, r.as_ref().ok().unwrap().text);
+        assert_eq!(
+            r#"id = 123
+title = "Lorem ipsum dolor sit amet"
+
+[author]
+first_name = "John"
+id = 999
+last_name = "Doe"
+"#,
+            r.as_ref().ok().unwrap().text
+        );
 
         // Error
         // TODO: this test will be panicked on `r.is_err()`. need to survey why the panic occurs..

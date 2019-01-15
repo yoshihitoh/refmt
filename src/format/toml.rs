@@ -4,6 +4,8 @@ use serde::ser;
 
 use crate::errors::{self, ErrorKind};
 
+pub use toml::Value as InnerValue;
+
 pub fn serialize<V: ser::Serialize>(v: V) -> Result<String, errors::Error> {
     Ok(toml::to_string(&v).context(ErrorKind::Serialization)?)
 }
