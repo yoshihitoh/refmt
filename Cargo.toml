@@ -16,7 +16,7 @@ name = "refmt-generate-assets"
 path = "src/bin/generate_assets/main.rs"
 
 [dependencies]
-ansi_term = "0.11"
+ansi_term = "0.12"
 atty = "0.2"
 env_logger = "0.6"
 failure = "0.1"
