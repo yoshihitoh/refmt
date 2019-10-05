@@ -23,7 +23,7 @@ failure = "0.1"
 log = "0.4"
 serde = "1.0"
 serde_yaml = "0.8"
-strum = "0.15"
+strum = "0.16"
 strum_macros = "0.16"
 toml = "0.5"
 
