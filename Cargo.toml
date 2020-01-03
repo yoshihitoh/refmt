@@ -24,7 +24,7 @@ log = "0.4"
 serde = "1.0"
 serde_yaml = "0.8"
 strum = "0.16"
-strum_macros = "0.16"
+strum_macros = "0.17"
 toml = "0.5"
 
 [dependencies.clap ]
