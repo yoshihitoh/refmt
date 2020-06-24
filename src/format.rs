@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use failure::{Fail, ResultExt};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
@@ -9,12 +8,6 @@ use crate::errors;
 mod json;
 mod toml;
 mod yaml;
-
-#[derive(Fail, Debug)]
-#[fail(display = "Unsupported format: {}", name)]
-struct UnsupportedFormatError {
-    name: String,
-}
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, EnumIter)]
 pub enum Format {
@@ -60,10 +53,7 @@ impl FromStr for Format {
         let lower = s.to_ascii_lowercase();
         Ok(Format::iter()
             .find(|f| f.is_extension(&lower))
-            .ok_or(UnsupportedFormatError {
-                name: s.to_string(),
-            })
-            .context(errors::ErrorKind::FormatName)?)
+            .ok_or(errors::Error::FormatName(s.to_string()))?)
     }
 }
 

@@ -1,7 +1,5 @@
 use std::process;
 
-use failure::Fail;
-
 use refmt::errors;
 
 mod app;
@@ -10,11 +8,7 @@ mod printer;
 fn handle_error(error: &errors::Error) {
     use ansi_term::Color::Red;
     let label = Red.paint("[refmt error]");
-    if let Some(cause) = error.cause() {
-        eprintln!("{}: {}. cause: {}", label, error, cause);
-    } else {
-        eprintln!("{}: {}.", label, error);
-    }
+    eprintln!("{}: {}.", label, error);
 }
 
 fn initialize() {

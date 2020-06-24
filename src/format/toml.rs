@@ -1,20 +1,21 @@
-use failure::ResultExt;
 use serde::de;
 use serde::ser;
 
-use crate::errors::{self, ErrorKind};
+use crate::errors;
 
 pub use toml::Value as InnerValue;
 
 pub fn serialize<V: ser::Serialize>(v: V) -> Result<String, errors::Error> {
-    Ok(toml::to_string(&v).context(ErrorKind::Serialization)?)
+    let toml = toml::to_string(&v).map_err(|e| errors::Error::Serialization(e.to_string()))?;
+    Ok(toml)
 }
 
 pub fn deserialize<V>(s: &str) -> Result<V, errors::Error>
 where
     V: for<'de> de::Deserialize<'de>,
 {
-    Ok(toml::from_str(s).context(ErrorKind::Deserialization)?)
+    let data = toml::from_str(s).map_err(|e| errors::Error::Deserialization(e.to_string()))?;
+    Ok(data)
 }
 
 #[cfg(test)]

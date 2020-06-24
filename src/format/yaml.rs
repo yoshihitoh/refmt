@@ -1,20 +1,23 @@
-use failure::ResultExt;
 use serde::de;
 use serde::ser;
 
-use crate::errors::{self, ErrorKind};
+use crate::errors;
 
 pub use serde_yaml::Value as InnerValue;
 
 pub fn serialize<V: ser::Serialize>(v: V) -> Result<String, errors::Error> {
-    Ok(serde_yaml::to_string(&v).context(ErrorKind::Serialization)?)
+    let yaml =
+        serde_yaml::to_string(&v).map_err(|e| errors::Error::Serialization(format!("{:?}", e)))?;
+    Ok(yaml)
 }
 
 pub fn deserialize<V>(s: &str) -> Result<V, errors::Error>
 where
     V: for<'de> de::Deserialize<'de>,
 {
-    Ok(serde_yaml::from_str(s).context(ErrorKind::Deserialization)?)
+    let data =
+        serde_yaml::from_str(s).map_err(|e| errors::Error::Deserialization(format!("{:?}", e)))?;
+    Ok(data)
 }
 
 #[cfg(test)]
