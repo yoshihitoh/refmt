@@ -135,15 +135,6 @@ author:
 
         let r = Format::from_str("conf"); // HOCON
         assert!(r.is_err());
-        assert_eq!(errors::ErrorKind::FormatName, r.err().unwrap().kind());
-
-        let r = Format::from_str("ini");
-        assert!(r.is_err());
-        assert_eq!(errors::ErrorKind::FormatName, r.err().unwrap().kind());
-
-        let r = Format::from_str("xml");
-        assert!(r.is_err());
-        assert_eq!(errors::ErrorKind::FormatName, r.err().unwrap().kind());
     }
 
     #[test]
@@ -174,7 +165,6 @@ last_name = "Doe"
         let text = FormattedText::new(Format::Json, YAML_TEXT.to_string());
         let r = text.convert_to(Format::Toml);
         assert!(r.is_err());
-        assert_eq!(errors::ErrorKind::Deserialization, r.err().unwrap().kind());
     }
 
     #[test]
@@ -206,7 +196,6 @@ last_name = "Doe"
         let text = FormattedText::new(Format::Toml, JSON_TEXT.to_string());
         let r = text.convert_to(Format::Yaml);
         assert!(r.is_err());
-        assert_eq!(errors::ErrorKind::Deserialization, r.err().unwrap().kind());
     }
 
     #[test]
