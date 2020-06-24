@@ -23,7 +23,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_derive::{Deserialize, Serialize};
+    use serde::{Deserialize, Serialize};
 
     #[derive(Serialize, Deserialize, Eq, PartialEq)]
     struct Author {
