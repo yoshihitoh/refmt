@@ -21,7 +21,7 @@ anyhow = "1"
 atty = "0.2"
 env_logger = "0.7"
 log = "0.4"
-serde = "1.0"
+serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
 strum = "0.18"
 strum_macros = "0.18"
@@ -40,6 +40,3 @@ features = ["preserve_order"]
 version = "4.2"
 default_features = false
 features = ["parsing", "yaml-load", "dump-load", "dump-create", "regex-onig"]
-
-[dev-dependencies]
-serde_derive = "1.0"
