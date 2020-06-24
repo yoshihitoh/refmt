@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use failure::{Fail, ResultExt};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
@@ -9,12 +8,6 @@ use crate::errors;
 mod json;
 mod toml;
 mod yaml;
-
-#[derive(Fail, Debug)]
-#[fail(display = "Unsupported format: {}", name)]
-struct UnsupportedFormatError {
-    name: String,
-}
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, EnumIter)]
 pub enum Format {
@@ -60,10 +53,7 @@ impl FromStr for Format {
         let lower = s.to_ascii_lowercase();
         Ok(Format::iter()
             .find(|f| f.is_extension(&lower))
-            .ok_or(UnsupportedFormatError {
-                name: s.to_string(),
-            })
-            .context(errors::ErrorKind::FormatName)?)
+            .ok_or(errors::Error::FormatName(s.to_string()))?)
     }
 }
 
@@ -145,15 +135,6 @@ author:
 
         let r = Format::from_str("conf"); // HOCON
         assert!(r.is_err());
-        assert_eq!(errors::ErrorKind::FormatName, r.err().unwrap().kind());
-
-        let r = Format::from_str("ini");
-        assert!(r.is_err());
-        assert_eq!(errors::ErrorKind::FormatName, r.err().unwrap().kind());
-
-        let r = Format::from_str("xml");
-        assert!(r.is_err());
-        assert_eq!(errors::ErrorKind::FormatName, r.err().unwrap().kind());
     }
 
     #[test]
@@ -184,7 +165,6 @@ last_name = "Doe"
         let text = FormattedText::new(Format::Json, YAML_TEXT.to_string());
         let r = text.convert_to(Format::Toml);
         assert!(r.is_err());
-        assert_eq!(errors::ErrorKind::Deserialization, r.err().unwrap().kind());
     }
 
     #[test]
@@ -216,7 +196,6 @@ last_name = "Doe"
         let text = FormattedText::new(Format::Toml, JSON_TEXT.to_string());
         let r = text.convert_to(Format::Yaml);
         assert!(r.is_err());
-        assert_eq!(errors::ErrorKind::Deserialization, r.err().unwrap().kind());
     }
 
     #[test]

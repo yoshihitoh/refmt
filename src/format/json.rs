@@ -1,20 +1,23 @@
-use failure::ResultExt;
 use serde::de;
 use serde::ser;
 
-use crate::errors::{self, ErrorKind};
+use crate::errors;
 
 pub use serde_json::Value as InnerValue;
 
 pub fn serialize<V: ser::Serialize>(v: V) -> Result<String, errors::Error> {
-    Ok(serde_json::to_string_pretty(&v).context(ErrorKind::Serialization)?)
+    let json = serde_json::to_string_pretty(&v)
+        .map_err(|e| errors::Error::Serialization(e.to_string()))?;
+    Ok(json)
 }
 
 pub fn deserialize<V>(s: &str) -> Result<V, errors::Error>
 where
     V: for<'de> de::Deserialize<'de>,
 {
-    Ok(serde_json::from_str(s).context(ErrorKind::Deserialization)?)
+    let data =
+        serde_json::from_str(s).map_err(|e| errors::Error::Deserialization(e.to_string()))?;
+    Ok(data)
 }
 
 #[cfg(test)]

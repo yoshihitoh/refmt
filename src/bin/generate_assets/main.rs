@@ -1,13 +1,12 @@
 use std::path::Path;
 
+use anyhow::{anyhow, Context};
 use clap::{App, Arg};
-use failure::ResultExt;
 use syntect::dumps::dump_to_file;
 use syntect::highlighting::ThemeSet;
 use syntect::parsing::{SyntaxSet, SyntaxSetBuilder};
 
 use refmt::assets::HighlightAssets;
-use refmt::errors;
 
 struct AssetBuilder {}
 
@@ -15,7 +14,7 @@ impl AssetBuilder {
     pub fn build_from_files(
         syntaxes_dir: &Path,
         themes_dir: &Path,
-    ) -> Result<HighlightAssets, errors::Error> {
+    ) -> Result<HighlightAssets, anyhow::Error> {
         let builder = AssetBuilder::default();
         Ok(HighlightAssets {
             syntax_set: builder.build_syntaxes(syntaxes_dir)?,
@@ -23,30 +22,30 @@ impl AssetBuilder {
         })
     }
 
-    pub fn save(assets: HighlightAssets, assets_dir: &Path) -> Result<(), errors::Error> {
+    pub fn save(assets: HighlightAssets, assets_dir: &Path) -> Result<(), anyhow::Error> {
         dump_to_file(&assets.syntax_set, assets_dir.join("syntaxes.bin"))
-            .context(errors::ErrorKind::CreatingAssets)?;
+            .context("Cannot create assets sytaxes.bin")?;
         dump_to_file(&assets.theme_set, assets_dir.join("themes.bin"))
-            .context(errors::ErrorKind::CreatingAssets)?;
+            .context("Cannot create assets theme.bin")?;
 
         Ok(())
     }
 
-    fn build_syntaxes(&self, syntaxes_dir: &Path) -> Result<SyntaxSet, errors::Error> {
+    fn build_syntaxes(&self, syntaxes_dir: &Path) -> Result<SyntaxSet, anyhow::Error> {
         let mut syntax_set_builder = SyntaxSetBuilder::new();
         syntax_set_builder.add_plain_text_syntax();
         syntax_set_builder
             .add_from_folder(syntaxes_dir, true)
-            .context(errors::ErrorKind::CreatingAssets)?;
+            .map_err(|e| anyhow!("Cannot create syntaxes. error:{:?}", e))?;
 
         Ok(syntax_set_builder.build())
     }
 
-    fn build_themes(&self, themes_dir: &Path) -> Result<ThemeSet, errors::Error> {
+    fn build_themes(&self, themes_dir: &Path) -> Result<ThemeSet, anyhow::Error> {
         let mut theme_set = ThemeSet::default();
         theme_set
             .add_from_folder(themes_dir)
-            .context(errors::ErrorKind::CreatingAssets)?;
+            .map_err(|e| anyhow!("Cannot create themes. error:{:?}", e))?;
 
         Ok(theme_set)
     }
@@ -80,7 +79,7 @@ fn parse_args() -> ProgramOption {
     }
 }
 
-fn main() -> Result<(), errors::Error> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let options = parse_args();
     let assets_dir = Path::new(&options.assets_dir);
     let assets =

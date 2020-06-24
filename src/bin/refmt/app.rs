@@ -4,7 +4,6 @@ use std::path::Path;
 use std::str::FromStr;
 
 use clap::{crate_authors, crate_name, crate_version, App as ClapApp, AppSettings, Arg};
-use failure::ResultExt;
 use log::debug;
 use syntect::dumps::from_binary;
 
@@ -24,15 +23,23 @@ struct Config {
     theme_name: String,
 }
 
-fn infer_format(file: Option<&str>, format_name: Option<&str>) -> Result<Format, errors::Error> {
-    let format_name = format_name
-        .or_else(|| {
-            file.and_then(|f| Path::new(f).extension())
-                .and_then(|s| s.to_str())
-        })
-        .ok_or(errors::Error::from(errors::ErrorKind::InferFormat))?;
+fn infer_format_name<'a>(file: Option<&'a str>, format_name: Option<&'a str>) -> Option<&'a str> {
+    if let Some(format_name) = format_name {
+        Some(format_name)
+    } else if let Some(file) = file {
+        Path::new(file).extension().and_then(|ext| ext.to_str())
+    } else {
+        None
+    }
+}
 
-    Format::from_str(format_name)
+fn infer_format(file: Option<&str>, format_name: Option<&str>) -> Result<Format, errors::Error> {
+    let format_name = infer_format_name(file, format_name);
+    if let Some(format_name) = format_name {
+        Format::from_str(format_name)
+    } else {
+        Err(errors::Error::InferFormat)
+    }
 }
 
 impl Config {
@@ -50,14 +57,11 @@ impl Config {
 
         let output_format = matches.value_of("OUTPUT_FORMAT");
         debug!("output_format: {:?}", output_format);
-        let output_format =
-            infer_format(output_file, output_format).or_else(|e| match e.kind() {
-                errors::ErrorKind::InferFormat => Ok(input_format),
-                _ => Err(e),
-            })?;
+        let output_format = infer_format_name(output_file, output_format)
+            .map(Format::from_str)
+            .unwrap_or_else(|| Ok(input_format))?;
 
         let theme_name = "Monokai Extended";
-
         Ok(Config {
             input_file: input_file.map(|s| s.to_string()),
             input_format,
@@ -171,18 +175,14 @@ impl App {
         let stdin = stdin();
         let lock = stdin.lock();
         let mut reader = if let Some(f) = self.config.input_file.as_ref() {
-            Box::new(BufReader::new(
-                File::open(f).context(errors::ErrorKind::Io)?,
-            )) as Box<BufRead>
+            Box::new(BufReader::new(File::open(f)?)) as Box<dyn BufRead>
         } else {
-            Box::new(lock) as Box<BufRead>
+            Box::new(lock) as Box<dyn BufRead>
         };
 
         // read
         let mut text = String::new();
-        reader
-            .read_to_string(&mut text)
-            .context(errors::ErrorKind::Io)?;
+        reader.read_to_string(&mut text)?;
 
         Ok(FormattedText::new(self.config.input_format, text))
     }
@@ -192,18 +192,16 @@ impl App {
         let stdout = stdout();
         let lock = stdout.lock();
         let mut w = if let Some(f) = self.config.output_file.as_ref() {
-            Box::new(BufWriter::new(
-                File::create(f).context(errors::ErrorKind::Io)?,
-            )) as Box<Write>
+            Box::new(BufWriter::new(File::create(f)?)) as Box<dyn Write>
         } else {
-            Box::new(lock) as Box<Write>
+            Box::new(lock) as Box<dyn Write>
         };
 
         // select printer
         let printer = if self.config.output_file.is_none() && self.config.color_enabled {
-            Box::new(HighlightTextPrinter::new(&self.assets)) as Box<Printer>
+            Box::new(HighlightTextPrinter::new(&self.assets)) as Box<dyn Printer>
         } else {
-            Box::new(PlainTextPrinter::default()) as Box<Printer>
+            Box::new(PlainTextPrinter::default()) as Box<dyn Printer>
         };
 
         // print
