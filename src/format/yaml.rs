@@ -8,7 +8,7 @@ pub use serde_yaml::Value as InnerValue;
 pub fn serialize<V: ser::Serialize>(v: V) -> Result<String, errors::Error> {
     let yaml =
         serde_yaml::to_string(&v).map_err(|e| errors::Error::Serialization(format!("{:?}", e)))?;
-    Ok(yaml)
+    Ok(yaml.trim_end().to_string())
 }
 
 pub fn deserialize<V>(s: &str) -> Result<V, errors::Error>
