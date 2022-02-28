@@ -208,3 +208,24 @@ impl App {
         printer.print(&mut w, text)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use syntect::dumps::from_reader;
+    use syntect::highlighting::ThemeSet;
+    use syntect::parsing::SyntaxSet;
+
+    #[test]
+    fn syntax_set_asset() -> anyhow::Result<()> {
+        let bytes: &[u8] = include_bytes!("../../../assets/syntaxes.bin");
+        let _syntaxes: SyntaxSet = from_reader(bytes)?;
+        Ok(())
+    }
+
+    #[test]
+    fn theme_set_asset() -> anyhow::Result<()> {
+        let bytes: &[u8] = include_bytes!("../../../assets/themes.bin");
+        let _themes: ThemeSet = from_reader(bytes)?;
+        Ok(())
+    }
+}
