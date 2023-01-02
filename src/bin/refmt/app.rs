@@ -9,16 +9,16 @@ use syntect::dumps::from_binary;
 
 use refmt::assets::HighlightAssets;
 use refmt::errors;
-use refmt::format::{Format, FormattedText};
+use refmt::format::{FileFormat, FormattedText};
 
 use crate::printer::{HighlightTextPrinter, PlainTextPrinter, Printer};
 
 #[derive(Debug)]
 struct Config {
     input_file: Option<String>,
-    input_format: Format,
+    input_format: FileFormat,
     output_file: Option<String>,
-    output_format: Format,
+    output_format: FileFormat,
     color_enabled: bool,
     theme_name: String,
 }
@@ -33,10 +33,13 @@ fn infer_format_name<'a>(file: Option<&'a str>, format_name: Option<&'a str>) ->
     }
 }
 
-fn infer_format(file: Option<&str>, format_name: Option<&str>) -> Result<Format, errors::Error> {
+fn infer_format(
+    file: Option<&str>,
+    format_name: Option<&str>,
+) -> Result<FileFormat, errors::Error> {
     let format_name = infer_format_name(file, format_name);
     if let Some(format_name) = format_name {
-        Format::from_str(format_name)
+        FileFormat::from_str(format_name)
     } else {
         Err(errors::Error::InferFormat)
     }
@@ -58,7 +61,7 @@ impl Config {
         let output_format = matches.value_of("OUTPUT_FORMAT");
         debug!("output_format: {:?}", output_format);
         let output_format = infer_format_name(output_file, output_format)
-            .map(Format::from_str)
+            .map(FileFormat::from_str)
             .unwrap_or_else(|| Ok(input_format))?;
 
         let theme_name = "Monokai Extended";
@@ -100,7 +103,7 @@ fn build_clap_app(color_enabled: bool) -> clap::App<'static, 'static> {
                 .takes_value(true)
                 .value_name("FORMAT_NAME")
                 .case_insensitive(true)
-                .possible_values(&Format::names()),
+                .possible_values(&FileFormat::names()),
         )
         .arg(
             Arg::with_name("OUTPUT_FILE")
@@ -117,7 +120,7 @@ fn build_clap_app(color_enabled: bool) -> clap::App<'static, 'static> {
                 .takes_value(true)
                 .value_name("FORMAT_NAME")
                 .case_insensitive(true)
-                .possible_values(&Format::names()),
+                .possible_values(&FileFormat::names()),
         )
 }
 

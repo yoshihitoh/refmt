@@ -1,5 +1,6 @@
 use std::io;
 
+use refmt_serde::RefmtError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -7,11 +8,8 @@ pub enum Error {
     #[error("IO Error. cause:{_0}")]
     Io(#[from] io::Error),
 
-    #[error("Any errors occurred during serialization")]
-    Serialization(String),
-
-    #[error("Any errors occurred during deserialization")]
-    Deserialization(String),
+    #[error("Any errors occurred on re-format. cause:{_0}")]
+    RefmtError(#[from] RefmtError),
 
     #[error("Unsupported format name. name:{_0}")]
     FormatName(String),

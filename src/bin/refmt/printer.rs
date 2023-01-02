@@ -21,7 +21,7 @@ impl Default for PlainTextPrinter {
 
 impl Printer for PlainTextPrinter {
     fn print(&self, dest: &mut dyn Write, text: &FormattedText) -> Result<(), errors::Error> {
-        Ok(writeln!(dest, "{}", text.text.as_str()).map_err(errors::Error::Io)?)
+        Ok(write!(dest, "{}", text.text.as_str()).map_err(errors::Error::Io)?)
     }
 }
 
@@ -42,6 +42,6 @@ impl<'a> Printer for HighlightTextPrinter<'a> {
         let mut highlight = HighlightLines::new(syntax, theme);
         let ranges = highlight.highlight(&text.text, &self.assets.syntax_set);
         let escaped = as_24_bit_terminal_escaped(&ranges, true);
-        Ok(writeln!(dest, "{}", escaped).map_err(errors::Error::from)?)
+        Ok(write!(dest, "{}", escaped).map_err(errors::Error::from)?)
     }
 }
