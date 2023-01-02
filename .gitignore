@@ -1,5 +1,7 @@
-/target
+.idea/
+.fleet/
+
+target/
 **/*.rs.bk
 
-.idea/
 .envrc
