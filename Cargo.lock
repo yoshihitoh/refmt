@@ -140,12 +140,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dtoa"
-version = "0.4.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "134951f4028bdadb9b84baf4232681efbf277da25144b9b0ad65df75946c422b"
-
-[[package]]
 name = "env_logger"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -368,7 +362,7 @@ dependencies = [
  "refmt-serde",
  "serde",
  "serde_json",
- "serde_yaml 0.8.17",
+ "serde_yaml",
  "strum",
  "strum_macros",
  "syntect",
@@ -383,7 +377,7 @@ dependencies = [
  "once_cell",
  "serde",
  "serde_json",
- "serde_yaml 0.9.16",
+ "serde_yaml",
  "thiserror",
  "toml",
 ]
@@ -463,18 +457,6 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
-]
-
-[[package]]
-name = "serde_yaml"
-version = "0.8.17"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "15654ed4ab61726bf918a39cb8d98a2e2995b002387807fa6ba58fdf7f59bb23"
-dependencies = [
- "dtoa",
- "linked-hash-map",
- "serde",
- "yaml-rust",
 ]
 
 [[package]]
