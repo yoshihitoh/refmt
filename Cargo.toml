@@ -36,6 +36,6 @@ version = "2.32"
 features = ["suggestions", "color", "wrap_help"]
 
 [dependencies.syntect]
-version = "4.7"
+version = "5.0"
 default_features = false
 features = ["parsing", "yaml-load", "dump-load", "dump-create", "regex-onig"]
